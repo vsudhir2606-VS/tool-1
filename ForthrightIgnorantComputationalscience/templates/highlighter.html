@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto Text Highlighter - SAP & Third Party Apps</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .keyword-input {
+            margin-bottom: 10px;
+        }
+        .color-preview {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+        }
+        .highlighted-output {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            min-height: 200px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .config-item {
+            cursor: pointer;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            background-color: #f8f9fa;
+        }
+        .config-item:hover {
+            background-color: #e9ecef;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="text-center mb-4">
+                    <i class="fas fa-highlighter text-warning"></i>
+                    Auto Text Highlighter
+                </h1>
+                <p class="text-center text-muted">Highlight important keywords from SAP and other third-party applications</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Configuration Panel -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-cog"></i> Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Keywords Section -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Keywords to Highlight:</label>
+                            <div id="keywordsContainer">
+                                <div class="keyword-input">
+                                    <input type="text" class="form-control" placeholder="Enter keyword..." />
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary" id="addKeyword">
+                                <i class="fas fa-plus"></i> Add Keyword
+                            </button>
+                        </div>
+
+                        <!-- Colors Section -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Highlight Colors:</label>
+                            <div class="row" id="colorsContainer">
+                                <div class="col-auto mb-2">
+                                    <input type="color" class="form-control color-preview" value="#ffff00" title="Yellow">
+                                </div>
+                                <div class="col-auto mb-2">
+                                    <input type="color" class="form-control color-preview" value="#90EE90" title="Light Green">
+                                </div>
+                                <div class="col-auto mb-2">
+                                    <input type="color" class="form-control color-preview" value="#FFB6C1" title="Light Pink">
+                                </div>
+                                <div class="col-auto mb-2">
+                                    <input type="color" class="form-control color-preview" value="#87CEEB" title="Sky Blue">
+                                </div>
+                                <div class="col-auto mb-2">
+                                    <input type="color" class="form-control color-preview" value="#DDA0DD" title="Plum">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" id="highlightBtn">
+                                <i class="fas fa-highlighter"></i> Highlight Text
+                            </button>
+                            <button class="btn btn-info" id="clearBtn">
+                                <i class="fas fa-eraser"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Saved Configurations -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h6><i class="fas fa-save"></i> Saved Configurations</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="configName" placeholder="Config name...">
+                                <button class="btn btn-outline-success" id="saveConfig">
+                                    <i class="fas fa-save"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div id="savedConfigs">
+                            <p class="text-muted small">No saved configurations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-8">
+                <!-- Input Section -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-edit"></i> Input Text</h5>
+                    </div>
+                    <div class="card-body">
+                        <textarea class="form-control" id="inputText" rows="8" 
+                                  placeholder="Paste your text from SAP or any third-party application here...
+
+Example:
+- Purchase Order PO-123456 needs approval
+- Customer ID CUS-78901 has pending invoice
+- Material number MAT-456789 is out of stock
+- Error code E001 occurred in transaction
+- User ADMIN logged in successfully"></textarea>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <div class="card-body text-center">
+                                <h4 id="keywordCount">0</h4>
+                                <small>Keywords</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <div class="card-body text-center">
+                                <h4 id="matchCount">0</h4>
+                                <small>Total Matches</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card stats-card">
+                            <div class="card-body text-center">
+                                <h4 id="textLength">0</h4>
+                                <small>Characters</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output Section -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between">
+                        <h5><i class="fas fa-eye"></i> Highlighted Output</h5>
+                        <button class="btn btn-sm btn-outline-secondary" id="copyOutput">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="highlighted-output" id="outputText">
+                            Your highlighted text will appear here...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast for notifications -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="notificationToast" class="toast" role="alert">
+            <div class="toast-header">
+                <i class="fas fa-info-circle text-primary me-2"></i>
+                <strong class="me-auto">Notification</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="toastMessage">
+                Message here
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        let savedConfigs = [];
+
+        $(document).ready(function() {
+            loadSavedConfigs();
+            updateStats();
+
+            // Add keyword functionality
+            $('#addKeyword').click(function() {
+                const keywordHtml = `
+                    <div class="keyword-input">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Enter keyword..." />
+                            <button class="btn btn-outline-danger btn-sm remove-keyword">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                $('#keywordsContainer').append(keywordHtml);
+            });
+
+            // Remove keyword functionality
+            $(document).on('click', '.remove-keyword', function() {
+                $(this).closest('.keyword-input').remove();
+            });
+
+            // Highlight button functionality
+            $('#highlightBtn').click(function() {
+                highlightText();
+            });
+
+            // Clear button functionality
+            $('#clearBtn').click(function() {
+                $('#inputText').val('');
+                $('#outputText').text('Your highlighted text will appear here...');
+                $('#keywordsContainer input').val('');
+                updateStats();
+            });
+
+            // Save configuration
+            $('#saveConfig').click(function() {
+                saveConfiguration();
+            });
+
+            // Copy output functionality
+            $('#copyOutput').click(function() {
+                const output = $('#outputText').html();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = output;
+                const textToCopy = tempDiv.textContent || tempDiv.innerText || '';
+
+                navigator.clipboard.writeText(textToCopy).then(function() {
+                    showToast('Text copied to clipboard!');
+                }).catch(function() {
+                    showToast('Failed to copy text', 'error');
+                });
+            });
+
+            // Update stats when input changes
+            $('#inputText').on('input', updateStats);
+        });
+
+        function highlightText() {
+            const text = $('#inputText').val();
+            const keywords = getKeywords();
+            const colors = getColors();
+
+            if (!text.trim()) {
+                showToast('Please enter some text to highlight', 'warning');
+                return;
+            }
+
+            if (keywords.length === 0) {
+                showToast('Please add at least one keyword', 'warning');
+                return;
+            }
+
+            $.ajax({
+                url: '/api/highlight',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    text: text,
+                    keywords: keywords,
+                    colors: colors
+                }),
+                success: function(response) {
+                    $('#outputText').html(response.highlighted_text);
+                    $('#keywordCount').text(response.keyword_count);
+                    $('#matchCount').text(response.total_matches);
+                    updateStats();
+                    showToast('Text highlighted successfully!');
+                },
+                error: function() {
+                    showToast('Error highlighting text', 'error');
+                }
+            });
+        }
+
+        function getKeywords() {
+            const keywords = [];
+            $('#keywordsContainer input').each(function() {
+                const keyword = $(this).val().trim();
+                if (keyword) {
+                    keywords.push(keyword);
+                }
+            });
+            return keywords;
+        }
+
+        function getColors() {
+            const colors = [];
+            $('#colorsContainer input[type="color"]').each(function() {
+                colors.push($(this).val());
+            });
+            return colors;
+        }
+
+        function saveConfiguration() {
+            const configName = $('#configName').val().trim();
+            if (!configName) {
+                showToast('Please enter a configuration name', 'warning');
+                return;
+            }
+
+            const keywords = getKeywords();
+            const colors = getColors();
+
+            if (keywords.length === 0) {
+                showToast('Please add at least one keyword', 'warning');
+                return;
+            }
+
+            $.ajax({
+                url: '/api/save-config',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    config_name: configName,
+                    keywords: keywords,
+                    colors: colors
+                }),
+                success: function() {
+                    $('#configName').val('');
+                    loadSavedConfigs();
+                    showToast('Configuration saved successfully!');
+                },
+                error: function() {
+                    showToast('Error saving configuration', 'error');
+                }
+            });
+        }
+
+        function loadSavedConfigs() {
+            $.ajax({
+                url: '/api/configs',
+                method: 'GET',
+                success: function(configs) {
+                    savedConfigs = configs;
+                    displaySavedConfigs();
+                }
+            });
+        }
+
+        function displaySavedConfigs() {
+            const container = $('#savedConfigs');
+            container.empty();
+
+            if (savedConfigs.length === 0) {
+                container.html('<p class="text-muted small">No saved configurations</p>');
+                return;
+            }
+
+            savedConfigs.forEach(function(configName) {
+                const configHtml = `
+                    <div class="config-item d-flex justify-content-between align-items-center" data-config="${configName}">
+                        <span class="load-config" style="cursor: pointer; flex: 1;">${configName}</span>
+                        <button class="btn btn-sm btn-outline-danger delete-config" data-config="${configName}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.append(configHtml);
+            });
+
+            // Load configuration
+            $('.load-config').click(function() {
+                const configName = $(this).closest('.config-item').data('config');
+                loadConfiguration(configName);
+            });
+
+            // Delete configuration
+            $('.delete-config').click(function(e) {
+                e.stopPropagation();
+                const configName = $(this).data('config');
+                deleteConfiguration(configName);
+            });
+        }
+
+        function loadConfiguration(configName) {
+            $.ajax({
+                url: `/api/load-config/${configName}`,
+                method: 'GET',
+                success: function(config) {
+                    // Clear existing keywords
+                    $('#keywordsContainer').empty();
+
+                    // Add keywords
+                    config.keywords.forEach(function(keyword) {
+                        const keywordHtml = `
+                            <div class="keyword-input">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" value="${keyword}" />
+                                    <button class="btn btn-outline-danger btn-sm remove-keyword">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        $('#keywordsContainer').append(keywordHtml);
+                    });
+
+                    // Update colors
+                    if (config.colors && config.colors.length > 0) {
+                        $('#colorsContainer input[type="color"]').each(function(index) {
+                            if (config.colors[index]) {
+                                $(this).val(config.colors[index]);
+                            }
+                        });
+                    }
+
+                    showToast(`Configuration "${configName}" loaded!`);
+                },
+                error: function() {
+                    showToast('Error loading configuration', 'error');
+                }
+            });
+        }
+
+        function deleteConfiguration(configName) {
+            if (confirm(`Are you sure you want to delete "${configName}"?`)) {
+                $.ajax({
+                    url: `/api/delete-config/${configName}`,
+                    method: 'DELETE',
+                    success: function() {
+                        loadSavedConfigs();
+                        showToast('Configuration deleted successfully!');
+                    },
+                    error: function() {
+                        showToast('Error deleting configuration', 'error');
+                    }
+                });
+            }
+        }
+
+        function updateStats() {
+            const text = $('#inputText').val();
+            $('#textLength').text(text.length);
+        }
+
+        function showToast(message, type = 'success') {
+            const toastEl = document.getElementById('notificationToast');
+            const toast = new bootstrap.Toast(toastEl);
+
+            $('#toastMessage').text(message);
+
+            // Change toast color based on type
+            toastEl.className = `toast ${type === 'error' ? 'bg-danger text-white' : type === 'warning' ? 'bg-warning' : 'bg-success text-white'}`;
+
+            toast.show();
+        }
+    </script>
+</body>
+</html>

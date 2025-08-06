@@ -1,0 +1,17 @@
+{
+  "90052035": {
+    "login_count": 1,
+    "total_time_spent": 0.07951100000000001,
+    "customer_adds": 0,
+    "customer_removes": 0,
+    "restricted_party_adds": 0,
+    "restricted_party_removes": 0,
+    "screenings_run": 0,
+    "data_imports": 0,
+    "data_exports": 0,
+    "last_login": "2025-08-05T10:23:16.234503",
+    "login_history": [
+      "2025-08-05T10:23:16.234538"
+    ]
+  }
+}

@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Compact Header -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="jumbotron bg-primary text-white p-3 rounded text-center">
+            <h2 class="mb-0">Customer & Restricted Party Screening Tool</h2>
+        </div>
+    </div>
+</div>
+
+<!-- Compact Cards Grid -->
+<div class="row g-3">
+    <div class="col-lg-6 col-md-6">
+        <div class="card border-0 h-100 position-relative">
+            <div class="card-body text-center p-3">
+                <div class="mb-2">
+                    <i class="fas fa-search text-info" style="font-size: 2rem;"></i>
+                </div>
+                <h6 class="card-title mb-2">Search & Compare</h6>
+                <p class="text-muted small mb-3">Advanced screening and matching tools</p>
+                <a href="{{ url_for('search') }}" class="btn btn-info">
+                    <i class="fas fa-search me-1"></i>Start Screening
+                </a>
+            </div>
+            <div class="position-absolute top-0 end-0 m-2">
+                <span class="badge bg-success small">Featured</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6">
+        <div class="card border-0 h-100">
+            <div class="card-body text-center p-3">
+                <div class="mb-2">
+                    <i class="fas fa-flag text-success" style="font-size: 2rem;"></i>
+                </div>
+                <h6 class="card-title mb-2">Country Codes</h6>
+                <p class="text-muted small mb-3">Country codes reference and lookup</p>
+                <a href="{{ url_for('country_codes') }}" class="btn btn-success">
+                    <i class="fas fa-flag me-1"></i>View Country Codes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6">
+        <div class="card border-0 h-100">
+            <div class="card-body text-center p-3">
+                <div class="mb-2">
+                    <i class="fas fa-users text-primary" style="font-size: 2rem;"></i>
+                </div>
+                <h6 class="card-title mb-2">Customer Management</h6>
+                <p class="text-muted small mb-3">Manage customer information and contact details</p>
+                <a href="{{ url_for('customers') }}" class="btn btn-primary">
+                    <i class="fas fa-users me-1"></i>Manage Customers
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-md-6">
+        <div class="card border-0 h-100">
+            <div class="card-body text-center p-3">
+                <div class="mb-2">
+                    <i class="fas fa-ban text-warning" style="font-size: 2rem;"></i>
+                </div>
+                <h6 class="card-title mb-2">Restricted Parties</h6>
+                <p class="text-muted small mb-3">Maintain restricted parties database</p>
+                <a href="{{ url_for('restricted_parties') }}" class="btn btn-warning text-white">
+                    <i class="fas fa-ban me-1"></i>Manage Restricted Parties
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block developer_icon %}
+<!-- Developer Icon - Only on Home Page -->
+<div class="developer-icon" data-bs-toggle="modal" data-bs-target="#developerModal">
+    <i class="fas fa-download"></i>
+</div>
+
+<!-- Developer Modal -->
+<div class="modal fade" id="developerModal" tabindex="-1" aria-labelledby="developerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="developerModalLabel">
+                    <i class="fas fa-lock me-2"></i>Developer Access
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Authentication Form -->
+                <div id="authForm">
+                    <p class="text-muted mb-3">Enter developer credentials to access download options</p>
+                    <div class="mb-3">
+                        <label for="developerUsername" class="form-label">Developer Username</label>
+                        <input type="text" class="form-control" id="developerUsername" placeholder="Enter username" autocomplete="off">
+                    </div>
+                    <button type="button" class="btn btn-primary w-100" id="authenticateBtn">
+                        <i class="fas fa-key me-1"></i>Authenticate
+                    </button>
+                    <div id="authError" class="alert alert-danger mt-3" style="display: none;">
+                        Invalid username. Access denied.
+                    </div>
+                </div>
+
+                <!-- Download Options (Hidden initially) -->
+                <div id="downloadOptions" style="display: none;">
+                    <p class="text-muted mb-4">Download tools and offline versions</p>
+                    <div class="d-grid gap-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <i class="fas fa-file-archive fa-2x text-primary mb-2"></i>
+                                <h6>Complete Project ZIP</h6>
+                                <p class="text-muted small mb-3">Download the complete project with all source code, templates, and data files</p>
+                                <a href="/download/project-zip" class="btn btn-primary">
+                                    <i class="fas fa-download me-1"></i>Download ZIP
+                                </a>
+                            </div>
+                        </div>
+                        <div class="card border-success">
+                            <div class="card-body text-center">
+                                <i class="fas fa-desktop fa-2x text-success mb-2"></i>
+                                <h6>Offline Standalone App</h6>
+                                <p class="text-muted small mb-3">Download the standalone Python application that works offline</p>
+                                <a href="/download/standalone" class="btn btn-success">
+                                    <i class="fas fa-download me-1"></i>Download App
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const authForm = document.getElementById('authForm');
+    const downloadOptions = document.getElementById('downloadOptions');
+    const authenticateBtn = document.getElementById('authenticateBtn');
+    const usernameInput = document.getElementById('developerUsername');
+    const authError = document.getElementById('authError');
+
+    // Reset modal when it's opened
+    document.getElementById('developerModal').addEventListener('show.bs.modal', function() {
+        authForm.style.display = 'block';
+        downloadOptions.style.display = 'none';
+        authError.style.display = 'none';
+        usernameInput.value = '';
+    });
+
+    // Handle authentication
+    authenticateBtn.addEventListener('click', function() {
+        const username = usernameInput.value.trim();
+        
+        if (username === 'vsudhir') {
+            authForm.style.display = 'none';
+            downloadOptions.style.display = 'block';
+            authError.style.display = 'none';
+        } else {
+            authError.style.display = 'block';
+            usernameInput.value = '';
+        }
+    });
+
+    // Allow Enter key to authenticate
+    usernameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            authenticateBtn.click();
+        }
+    });
+});
+</script>
+{% endblock %}
